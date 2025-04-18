@@ -1,5 +1,5 @@
 import "./App.css";
-import useNotification from "./hooks/useNotification";
+import useNotification from "./hooks/useNotificationStack";
 import { NotificationProps } from "./types/types";
 
 function App() {
@@ -8,20 +8,23 @@ function App() {
     <div className="App">
       <h1>Message Toast</h1>
       {/* <Notification type="success" message={"that's a success!"} onClose={() => {}} duration={3000} /> */}
-      {(["success", "info", "error", "warning"] as NotificationProps["type"][]).map((e) => (
-        <div>
+      {[
+        { type: "success", duration: 3000 },
+        { type: "info", duration: 5000 },
+        { type: "error", duration: 4000 },
+        { type: "warning", duration: 6000 },
+      ].map((e) => (
+        <div key={e.type}>
           <button
-            key={e}
             onClick={() =>
               triggerNotification({
-                type: e,
-                message: `This is a ${e} type toast`,
-                duration: 3000,
-                onClose: () => {},
+                type: e.type as NotificationProps["type"],
+                message: `This is a ${e.type} type toast`,
+                duration: e.duration,
               })
             }
           >
-            Trigger {e}
+            Trigger {e.type}
           </button>
         </div>
       ))}
