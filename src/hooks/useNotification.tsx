@@ -1,25 +1,34 @@
-import React, { useCallback, useState } from "react";
-import { NotificationProps } from "../types/types";
+import React, { useCallback, useMemo, useState } from "react";
+import { NotificationProps, Position } from "../types/types";
 import Notification from "../components/Notification";
-
-type Position = "top-left" | "top-right" | "bottom-left" | "bottom-right";
 
 const useNotification = (position: Position) => {
   const [notification, setNotification] = useState<NotificationProps>(null!);
 
   let timer: number = 0;
 
-  const triggerNotification = useCallback((notification: NotificationProps) => {
+  const handleCloseNotification = () => setNotification(null!);
+
+  const triggerNotification = useCallback((notification: Omit<NotificationProps, "onClose" | "id">) => {
     clearTimeout(timer);
-    setNotification(notification);
+    setNotification({ ...notification, onClose: handleCloseNotification, id: Math.random() });
     timer = setTimeout(() => {
       setNotification(null!);
     }, notification.duration);
   }, []);
 
+  const containerStyle: React.CSSProperties = useMemo(
+    () => ({
+      [position.split("-")[1]]: 0,
+    }),
+    [position]
+  );
+
   const NotificationComponent: React.ReactNode = notification ? (
-    <div className={`toast ${position}`}>
-      <Notification {...notification} />
+    <div style={containerStyle} className="toast-container">
+      <div className={`toast ${position}`}>
+        <Notification {...notification} onClose={handleCloseNotification} />
+      </div>
     </div>
   ) : null;
 
